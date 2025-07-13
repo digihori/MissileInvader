@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">MissileInvader</string>
+
+    <string name="about_title">Missile Invader</string>
+    <string name="about_message">
+        A retro-style shooting game that recreates the 1970s electronic game “Missile Invader” for Android smartphones.\n
+        Features\n
+        - Classic shooting action: move your ship left and right and fire beams\n
+        - Nostalgic 7-segment-style score display\n
+        - Enemy flash effects and authentic attack patterns\n
+        - Gamepad support\n
+        - Includes sound effects and background music\n
+    </string>
+    <string name="about_ok">OK</string>
+    <string name="about_hyperlink_name">Privacy Policy</string>
+    <string name="about_hyperlink">https://github.com/digihori/beamgalaxian/blob/main/PRIVACY.md</string>
+</resources>
