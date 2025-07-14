@@ -1,26 +1,25 @@
+/* MainActivity.kt */
 package tk.horiuchi.missileinvader
 
-import android.content.Intent
 import android.graphics.Color
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.MotionEvent
 import android.view.View
 import android.view.WindowInsets
-import android.view.WindowInsetsController
 import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var gameView: GameView
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar?.title = "Missile Invader"
+        setContentView(R.layout.activity_main)
 
         // ステータスバーを隠す処理を安全に呼ぶ
         window.decorView.post {
@@ -31,41 +30,29 @@ class MainActivity : AppCompatActivity() {
                 window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
             }
         }
-        setContentView(R.layout.activity_main)
-
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         toolbar.overflowIcon?.setTint(Color.WHITE)
 
-        gameView = findViewById(R.id.game_view)
+        val gameView = findViewById<GameView>(R.id.gameView)
+        val seg1 = findViewById<ImageView>(R.id.seg1)
+        val seg2 = findViewById<ImageView>(R.id.seg2)
+        val missileCountText = findViewById<TextView>(R.id.missile_count_text)
+        gameView.bindScoreViews(seg1, seg2)
+        gameView.bindMissileCountText(missileCountText)
 
         findViewById<ImageButton>(R.id.btn_left).setOnClickListener {
-            gameView.moveLeft()
+            gameView.movePlayerLeft()
         }
-
         findViewById<ImageButton>(R.id.btn_right).setOnClickListener {
-            gameView.moveRight()
+            gameView.movePlayerRight()
         }
-
-        val btnFire = findViewById<ImageButton>(R.id.btn_fire)
-        btnFire.setOnTouchListener { _, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    gameView.fireMissile()
-                    true
-                }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    //gameView.releaseFire()
-                    true
-                }
-                else -> false
-            }
-            false
+        findViewById<ImageButton>(R.id.btn_fire).setOnClickListener {
+            gameView.fireMissile()
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        //Log.d("Menu", "onCreateOptionsMenu called")
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
@@ -73,23 +60,14 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_about -> {
-                showAboutDialog()
+                AlertDialog.Builder(this)
+                    .setTitle("About")
+                    .setMessage("Missile Invader\n\nRetro-inspired game based on LSI gameplay of the 1970s.")
+                    .setPositiveButton("OK", null)
+                    .show()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun showAboutDialog() {
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.about_title))
-            .setMessage(getString(R.string.about_message))
-            .setPositiveButton(getString(R.string.about_ok), null)
-            .setNeutralButton(getString(R.string.about_hyperlink_name)) { _, _ ->
-                val url = getString(R.string.about_hyperlink)
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                startActivity(intent)
-            }
-            .show()
     }
 }
