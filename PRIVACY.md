@@ -1,6 +1,6 @@
 # Privacy Policy
 [Click here for Japanese](./PRIVACY.ja.md)
-The application “Beam Galaxian” (hereinafter referred to as “this app”) respects the privacy of users and does not collect any personal information.
+The application “Missile Invader” (hereinafter referred to as “this app”) respects the privacy of users and does not collect any personal information.
 
 ## 1. Information Collected
 This app does not collect or store any of the following information:

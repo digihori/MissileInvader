@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
@@ -31,7 +32,7 @@ class GameView(context: Context, attrs: AttributeSet? = null) : View(context, at
     private val playerBitmap = BitmapFactory.decodeResource(resources, R.drawable.fighter)
     private var playerCol = 1
     private val playerRow = 6
-    private var playerMissileCount = 150
+    private var playerMissileCount = 50
     private var playerFlashing = false
     private var playerFlashCount = 0
 
@@ -132,6 +133,9 @@ class GameView(context: Context, attrs: AttributeSet? = null) : View(context, at
         load7SegImages()
         post(missileRunnable)
         post(enemyRunnable)
+        isFocusable = true
+        isFocusableInTouchMode = true
+        requestFocus()
     }
 
     fun bindScoreViews(seg1: ImageView, seg2: ImageView) {
@@ -171,7 +175,12 @@ class GameView(context: Context, attrs: AttributeSet? = null) : View(context, at
         val tens = (score / 10)
         val ones = (score % 10)
 
-        val tensChar = "0123456789ABCDEF"[tens.coerceIn(0, 15)]
+        //val tensChar = "0123456789ABCDEF"[tens.coerceIn(0, 15)]
+        val tensChar = if (score >= 10) {
+            "0123456789ABCDEF"[tens.coerceIn(0, 15)]
+        } else {
+            ' '  // ← 1桁のときは空白で消灯
+        }
         val onesChar = '0' + ones
 
         scoreSeg1?.setImageBitmap(segMap[tensChar] ?: segMap[' ']!!)
@@ -418,7 +427,7 @@ class GameView(context: Context, attrs: AttributeSet? = null) : View(context, at
 
     private fun restartGame() {
         score = 0
-        playerMissileCount = 150
+        playerMissileCount = 50
         playerCol = 1
         ufoCol = 0
         ufoVisible = true
@@ -436,6 +445,7 @@ class GameView(context: Context, attrs: AttributeSet? = null) : View(context, at
         invaderFlashing = false
         invaderFlashCount = 0
         updateScoreDisplay()
+        updateMissileCountDisplay()
         invalidate()
 
         // Runnable 再起動
@@ -491,4 +501,49 @@ class GameView(context: Context, attrs: AttributeSet? = null) : View(context, at
         missileCountTextView?.text = "$playerMissileCount"
     }
 
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        // 連続イベントは無視
+        if (event.repeatCount > 0) return true
+
+        if (isGameOver) {
+            if (canRestart) {
+                restartGame()
+            }
+            return true
+        }
+
+        when (keyCode) {
+            KeyEvent.KEYCODE_DPAD_LEFT -> {
+                movePlayerLeft()
+                return true
+            }
+            KeyEvent.KEYCODE_DPAD_RIGHT -> {
+                movePlayerRight()
+                return true
+            }
+            KeyEvent.KEYCODE_BUTTON_A -> {
+                fireMissile()
+                return true
+            }
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
+
+    private var gamePaused = false
+
+    fun pauseGame() {
+        gamePaused = true
+        handler.removeCallbacks(missileRunnable)
+        handler.removeCallbacks(enemyRunnable)
+    }
+
+    fun resumeGame() {
+        if (!isGameOver && gamePaused) {
+            gamePaused = false
+            handler.post(missileRunnable)
+            handler.post(enemyRunnable)
+        }
+    }
 }

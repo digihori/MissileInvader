@@ -1,9 +1,12 @@
 /* MainActivity.kt */
 package tk.horiuchi.missileinvader
 
+import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -15,7 +18,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 
+
 class MainActivity : AppCompatActivity() {
+    private lateinit var gameView: GameView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.title = "Missile Invader"
@@ -34,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         toolbar.overflowIcon?.setTint(Color.WHITE)
 
-        val gameView = findViewById<GameView>(R.id.gameView)
+        gameView = findViewById<GameView>(R.id.gameView)
         val seg1 = findViewById<ImageView>(R.id.seg1)
         val seg2 = findViewById<ImageView>(R.id.seg2)
         val missileCountText = findViewById<TextView>(R.id.missile_count_text)
@@ -60,14 +66,48 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_about -> {
-                AlertDialog.Builder(this)
-                    .setTitle("About")
-                    .setMessage("Missile Invader\n\nRetro-inspired game based on LSI gameplay of the 1970s.")
-                    .setPositiveButton("OK", null)
-                    .show()
+                gameView.pauseGame()
+                showAboutDialog()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun showAboutDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.about_title))
+            .setMessage(getString(R.string.about_message))
+            //.setPositiveButton(getString(R.string.about_ok), null)
+            .setPositiveButton(getString(R.string.about_ok)) { dialog, _ ->
+                dialog.dismiss()
+                gameView.resumeGame()  // ★ ダイアログが閉じられたときにゲームを再開
+            }
+            .setNeutralButton(getString(R.string.about_hyperlink_name)) { _, _ ->
+                val url = getString(R.string.about_hyperlink)
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                startActivity(intent)
+            }
+            .setOnCancelListener {
+                gameView.resumeGame()  // ★ 戻るボタンなどでもゲームを再開
+            }
+            .show()
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (event.repeatCount == 0) {
+            return gameView.onKeyDown(keyCode, event)
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        gameView.pauseGame()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        gameView.resumeGame()
     }
 }

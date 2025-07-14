@@ -16,35 +16,40 @@
         app:titleTextColor="@android:color/white" />
 
     <!-- スコア表示エリア -->
-    <LinearLayout
-        android:id="@+id/scoreLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp"
-        android:gravity="center">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/seg1"
-            android:layout_width="48dp"
-            android:layout_height="72dp"
-            android:layout_margin="2dp" />
+        <LinearLayout
+            android:id="@+id/scoreLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center">
 
-        <ImageView
-            android:id="@+id/seg2"
-            android:layout_width="48dp"
-            android:layout_height="72dp"
-            android:layout_margin="2dp" />
+            <ImageView
+                android:id="@+id/seg1"
+                android:layout_width="72dp"
+                android:layout_height="108dp"
+                android:layout_margin="2dp" />
+
+            <ImageView
+                android:id="@+id/seg2"
+                android:layout_width="72dp"
+                android:layout_height="108dp"
+                android:layout_margin="2dp" />
+        </LinearLayout>
         <!-- ★ここがデバッグ用残ミサイル表示 -->
         <TextView
             android:id="@+id/missile_count_text"
             android:layout_width="wrap_content"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:textColor="#CCCCCC"
-            android:textSize="18sp"
-            android:gravity="center_vertical" />
-    </LinearLayout>
+            android:textSize="24sp"
+            android:layout_gravity="end|bottom" />
+    </FrameLayout>
 
     <!-- ゲームビュー -->
     <tk.horiuchi.missileinvader.GameView
@@ -68,7 +73,9 @@
             android:layout_height="64dp"
             android:layout_margin="8dp"
             android:background="@drawable/btn_fire"
-            android:contentDescription="Fire Button" />
+            android:contentDescription="Fire Button"
+            android:focusable="false"
+            android:focusableInTouchMode="false"/>
 
         <ImageButton
             android:id="@+id/btn_left"
@@ -76,7 +83,9 @@
             android:layout_height="64dp"
             android:layout_margin="8dp"
             android:background="@drawable/btn_left"
-            android:contentDescription="Left Button" />
+            android:contentDescription="Left Button"
+            android:focusable="false"
+            android:focusableInTouchMode="false"/>
 
         <ImageButton
             android:id="@+id/btn_right"
@@ -84,6 +93,8 @@
             android:layout_height="64dp"
             android:layout_margin="8dp"
             android:background="@drawable/btn_right"
-            android:contentDescription="Right Button" />
+            android:contentDescription="Right Button"
+            android:focusable="false"
+            android:focusableInTouchMode="false"/>
     </LinearLayout>
 </LinearLayout>

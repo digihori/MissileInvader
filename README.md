@@ -1,12 +1,14 @@
-# Beam Galaxian
+# Missile Invader
 [Click here for Japanese](./README.ja.md)
 
-A retro-style shooting game that recreates the 1970s electronic game “Beam Galaxian” for Android smartphones.
+A retro-style shooting game that recreates the 1970s electronic game “Missile Invader” for Android smartphones.
 
 ## Features
 - Classic shooting action: move your ship left and right and fire beams
 - Nostalgic 7-segment-style score display
+- Scores of 99 or higher are indicated by A-F, and scores after that are indicated by flashing lights.
 - Enemy flash effects and authentic attack patterns
+- You may be able to use the secret technique of “hame-uchi”?
 - Gamepad support
 - Includes sound effects and background music
 
