@@ -13,6 +13,7 @@ import android.view.View
 import android.view.WindowInsets
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -46,6 +47,8 @@ class MainActivity : AppCompatActivity() {
         val missileCountText = findViewById<TextView>(R.id.missile_count_text)
         gameView.bindScoreViews(seg1, seg2)
         gameView.bindMissileCountText(missileCountText)
+        val missileGauge = findViewById<ProgressBar>(R.id.missile_gauge)
+        gameView.bindMissileGauge(missileGauge)
 
         findViewById<ImageButton>(R.id.btn_left).setOnClickListener {
             gameView.movePlayerLeft()

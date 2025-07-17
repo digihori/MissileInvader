@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 背景（暗い灰色） -->
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <solid android:color="#444444"/>
+        </shape>
+    </item>
+
+    <!-- プログレス（明るい緑色） -->
+    <item android:id="@android:id/progress">
+        <clip
+            android:clipOrientation="vertical"
+            android:gravity="top">
+            <shape android:shape="rectangle">
+                <solid android:color="#00FF00"/>
+            </shape>
+        </clip>
+    </item>
+</layer-list>

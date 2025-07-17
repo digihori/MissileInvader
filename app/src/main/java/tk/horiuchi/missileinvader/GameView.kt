@@ -2,6 +2,7 @@ package tk.horiuchi.missileinvader
 
 import android.content.Context
 import android.graphics.*
+import android.graphics.drawable.LayerDrawable
 import android.util.AttributeSet
 import android.util.Log
 import android.view.KeyEvent
@@ -10,6 +11,10 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import kotlin.random.Random
+import android.media.AudioAttributes
+import android.media.SoundPool
+import android.widget.ProgressBar
+
 
 class GameView(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
     private val paint = Paint()
@@ -65,6 +70,14 @@ class GameView(context: Context, attrs: AttributeSet? = null) : View(context, at
     private var isGameOver = false
     private var showGameOver = false
     private var canRestart = false
+
+    private lateinit var soundPool: SoundPool
+    private var soundMissileFire = 0
+    private var soundPlayerHit = 0
+    private var soundEnemyHit = 0
+    private var soundUfoHit = 0
+    private var bgmGameOver = 0
+
 
     private val missileRunnable = object : Runnable {
         override fun run() {
@@ -128,6 +141,22 @@ class GameView(context: Context, attrs: AttributeSet? = null) : View(context, at
     }
 
     init {
+        // サウンド初期化
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_GAME)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+        soundPool = SoundPool.Builder()
+            .setAudioAttributes(audioAttributes)
+            .setMaxStreams(3)
+            .build()
+
+        soundMissileFire = soundPool.load(context, R.raw.se_missile_fire, 1)
+        soundPlayerHit = soundPool.load(context, R.raw.se_player_hit, 1)
+        soundEnemyHit = soundPool.load(context, R.raw.se_enemy_hit, 1)
+        soundUfoHit = soundPool.load(context, R.raw.se_ufo_hit, 1)
+        bgmGameOver = soundPool.load(context, R.raw.bgm_gameover, 1)
+
         isFocusable = true
         isFocusableInTouchMode = true
         load7SegImages()
@@ -142,6 +171,14 @@ class GameView(context: Context, attrs: AttributeSet? = null) : View(context, at
         scoreSeg1 = seg1
         scoreSeg2 = seg2
         updateScoreDisplay()
+    }
+
+    private var missileGauge: ProgressBar? = null
+
+    fun bindMissileGauge(gauge: ProgressBar) {
+        missileGauge = gauge
+        missileGauge?.max = 50
+        missileGauge?.progress = playerMissileCount
     }
 
     private fun load7SegImages() {
@@ -345,6 +382,7 @@ class GameView(context: Context, attrs: AttributeSet? = null) : View(context, at
             playerMissiles.add(Missile(playerCol, playerRow - 1, true))
             playerMissileCount--
             updateMissileCountDisplay()
+            soundPool.play(soundMissileFire, 1f, 1f, 1, 0, 1f)  // ← ミサイル音
             invalidate()
         }
     }
@@ -399,12 +437,14 @@ class GameView(context: Context, attrs: AttributeSet? = null) : View(context, at
                 ufoFlashing = true
                 ufoFlashCount = 6
                 score += 5
+                soundPool.play(soundUfoHit, 1f, 1f, 1, 0, 1f)
                 toRemove.add(missile)
                 ufoNextSide = ufoDirection
             } else if (missile.row == invaderRow && missile.col == invaderCol && invaderVisible && !invaderFlashing) {
                 invaderFlashing = true
                 invaderFlashCount = 6
                 score += 1
+                soundPool.play(soundEnemyHit, 1f, 1f, 1, 0, 1f)
                 toRemove.add(missile)
             }
         }
@@ -419,6 +459,7 @@ class GameView(context: Context, attrs: AttributeSet? = null) : View(context, at
             playerMissileCount = (playerMissileCount - 5).coerceAtLeast(0)
             enemyMissiles.clear()
             updateMissileCountDisplay()
+            soundPool.play(soundPlayerHit, 1f, 1f, 1, 0, 1f)
             // ★ 自機点滅開始
             playerFlashing = true
             playerFlashCount = 6
@@ -475,6 +516,7 @@ class GameView(context: Context, attrs: AttributeSet? = null) : View(context, at
         isGameOver = true
         showGameOver = true
         canRestart = false
+        soundPool.play(bgmGameOver, 1f, 1f, 1, 0, 1f)
         invalidate()
 
         postDelayed({
@@ -498,7 +540,22 @@ class GameView(context: Context, attrs: AttributeSet? = null) : View(context, at
     }
 
     private fun updateMissileCountDisplay() {
-        missileCountTextView?.text = "$playerMissileCount"
+        //missileCountTextView?.text = "$playerMissileCount"
+        missileGauge?.progress = playerMissileCount
+
+        // ★ 色を変更
+        val color = when {
+            playerMissileCount <= 10 -> Color.RED
+            playerMissileCount <= 25 -> Color.YELLOW
+            else -> Color.GREEN
+        }
+
+        // Drawableの色変更（API 23以降で安全に利用可）
+        val progressDrawable = missileGauge?.progressDrawable?.mutate()
+        progressDrawable?.let {
+            val shape = (it as LayerDrawable).findDrawableByLayerId(android.R.id.progress)
+            shape?.setTint(color)
+        }
     }
 
 
