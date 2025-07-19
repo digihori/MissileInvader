@@ -579,7 +579,8 @@ class GameView(context: Context, attrs: AttributeSet? = null) : View(context, at
                 movePlayerRight()
                 return true
             }
-            KeyEvent.KEYCODE_BUTTON_A -> {
+            KeyEvent.KEYCODE_BUTTON_A, KeyEvent.KEYCODE_DPAD_CENTER,
+            KeyEvent.KEYCODE_ENTER -> {
                 fireMissile()
                 return true
             }
